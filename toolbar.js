@@ -1,4 +1,5 @@
 const debugToolbarPrefix = 'nccamera_debugtoolbar';
+
 const debugToolbar = `
   <style type="text/css">
     #${debugToolbarPrefix} {
@@ -25,13 +26,7 @@ const debugToolbar = `
   </style>
   <div id="${debugToolbarPrefix}">
     <div id="${debugToolbarPrefix}_status">Not connected</div>
-    <div>
-      White Balance: <select name=""><option>A</option></select> |
-      Speed: <select name=""><option>A</option></select> |
-      ISO: <select name=""><option>A</option></select> |
-      Aperture: <select name=""><option>A</option></select> |
-      Image Size: <select name=""><option>A</option></select>
-    </div>
+    <div><ul id="${debugToolbarPrefix}_settings"></ul></div>
     <div>
       <button id="${debugToolbarPrefix}_start">Start live</button>
       <button id="${debugToolbarPrefix}_stop">Stop live</button>
@@ -39,6 +34,21 @@ const debugToolbar = `
     </div>
   </div>
 `;
+
+// autopoweroff, imageformat, whitebalance, iso
+const CAMERA_SETTINGS = [
+  // Root categories
+  'capturesettings',
+  'imgsettings',
+  'settings',
+  // Settings we need
+  'autopoweroff',
+  'imageformat',
+  'whitebalance',
+  'iso',
+  'shutterspeed',
+  'aperture',
+];
 
 class Toolbar {
   container = null;
@@ -74,6 +84,7 @@ class Toolbar {
       .addEventListener('click', this.nccamera.autofocus);
 
     this.updateStatus();
+    this.updateSettings();
   };
 
   hide = () => {
@@ -88,6 +99,83 @@ class Toolbar {
         ? `Connected to ${this.nccamera.camera.model}`
         : 'Not connected';
     }
+  };
+
+  updateSettings = () => {
+    function showSetting(key, setting, container) {
+      const changeCheckbox = event => {
+        console.log(
+          'change checkbox',
+          event.target.name,
+          'to',
+          event.target.checked ? 1 : 0
+        );
+        nccamera.setSetting(event.target.name, event.target.checked ? 1 : 0);
+      };
+      const changeSelect = event => {
+        console.log(
+          'change select',
+          event.target.name,
+          'to',
+          event.target.value
+        );
+        nccamera.setSetting(event.target.name, event.target.value);
+      };
+
+      const node = document.createElement('li');
+      node.innerText = setting.label;
+      if (setting.value !== undefined) {
+        if (setting.type === 'choice') {
+          const select = document.createElement('select');
+          select.setAttribute('name', key);
+          for (const choice of setting.choices) {
+            if (choice.indexOf('Unknown') !== -1) {
+              continue;
+            }
+            const option = document.createElement('option');
+            option.setAttribute('value', choice);
+            if (setting.value === choice) {
+              option.setAttribute('selected', 'selected');
+            }
+            option.innerText = choice;
+            select.appendChild(option);
+          }
+          select.onchange = changeSelect;
+          node.appendChild(select);
+        } else if (setting.type === 'toggle') {
+          const checkbox = document.createElement('input');
+          checkbox.setAttribute('type', 'checkbox');
+          checkbox.setAttribute('name', key);
+          if (setting.value > 0) {
+            checkbox.setAttribute('checked', 'checked');
+          }
+          checkbox.onchange = changeCheckbox;
+          node.appendChild(checkbox);
+        } else {
+          node.innerText = `${setting.label}: ${setting.value}`;
+        }
+      }
+
+      if (setting.children) {
+        const childList = document.createElement('ul');
+        for (const i in setting.children) {
+          if (CAMERA_SETTINGS.indexOf(i) > -1) {
+            showSetting(i, setting.children[i], childList);
+          }
+        }
+        node.appendChild(childList);
+      }
+      container.appendChild(node);
+    }
+
+    this.nccamera.getSettings().then(settings => {
+      console.log('Got settings', settings);
+      showSetting(
+        'main',
+        settings.main,
+        document.getElementById(`${debugToolbarPrefix}_settings`)
+      );
+    });
   };
 }
 
