@@ -47,7 +47,7 @@ class Toolbar {
   constructor(nccamera) {
     this.nccamera = nccamera;
 
-    document.addEventListener('keyup', (event) => {
+    document.addEventListener('keyup', event => {
       if (event.keyCode === 67) {
         if (this.container) {
           this.hide();
@@ -63,27 +63,32 @@ class Toolbar {
     this.container.innerHTML = debugToolbar;
     document.body.appendChild(this.container);
 
-    document.getElementById(`${debugToolbarPrefix}_start`)
+    document
+      .getElementById(`${debugToolbarPrefix}_start`)
       .addEventListener('click', this.nccamera.startLive);
-    document.getElementById(`${debugToolbarPrefix}_stop`)
+    document
+      .getElementById(`${debugToolbarPrefix}_stop`)
       .addEventListener('click', this.nccamera.stopLive);
-    document.getElementById(`${debugToolbarPrefix}_focus`)
+    document
+      .getElementById(`${debugToolbarPrefix}_focus`)
       .addEventListener('click', this.nccamera.autofocus);
 
     this.updateStatus();
-  }
+  };
 
   hide = () => {
     document.body.removeChild(this.container);
     this.container = null;
-  }
+  };
 
   updateStatus = () => {
     const status = document.getElementById(`${debugToolbarPrefix}_status`);
     if (status) {
-      status.innerText = this.nccamera.camera ? `Connected to ${this.nccamera.camera.model}` : 'Not connected';
+      status.innerText = this.nccamera.camera
+        ? `Connected to ${this.nccamera.camera.model}`
+        : 'Not connected';
     }
-  }
+  };
 }
 
 module.exports = Toolbar;
