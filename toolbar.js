@@ -69,11 +69,20 @@ class Toolbar {
       .addEventListener('click', this.nccamera.stopLive);
     document.getElementById(`${debugToolbarPrefix}_focus`)
       .addEventListener('click', this.nccamera.autofocus);
+
+    this.updateStatus();
   }
 
   hide = () => {
     document.body.removeChild(this.container);
     this.container = null;
+  }
+
+  updateStatus = () => {
+    const status = document.getElementById(`${debugToolbarPrefix}_status`);
+    if (status) {
+      status.innerText = this.nccamera.camera ? `Connected to ${this.nccamera.camera.model}` : 'Not connected';
+    }
   }
 }
 

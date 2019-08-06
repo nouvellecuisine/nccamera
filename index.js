@@ -57,6 +57,7 @@ class NCCamera {
       console.log('NCCamera', 'Existing camera object discarded');
       delete this.camera;
       this.camera = null;
+      this.toolbar.updateStatus();
     }
 
     if (this.GPhoto !== null) {
@@ -81,6 +82,7 @@ class NCCamera {
         }
 
         this.camera = list[0];
+        this.toolbar.updateStatus();
         console.log('NCCamera', 'Found', this.camera.model);
 
         resolve(this.camera);
