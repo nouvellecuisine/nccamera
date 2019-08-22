@@ -1,4 +1,5 @@
 const gphoto2 = require('@nouvellecuisine/gphoto2');
+const promiseRetry = require('promise-retry');
 
 const Toolbar = require('./toolbar');
 
@@ -164,43 +165,53 @@ class NCCamera {
     );
   };
 
-  capture = () => {
+  capture = autofocus => {
     if (this.camera === null) {
       console.warn('NCCamera', 'No camera detected');
       return;
     }
 
-    return new Promise((resolve, reject) => {
-      this.camera.takePicture(
-        {
-          preview: false,
-          download: true,
-        },
-        (er, data) => {
-          if (er < 0) {
-            console.warn(
-              'NCCamera',
-              'Error received from camera, stopping live',
-              er
-            );
-            reject(er);
-          } else {
-            if (data) {
-              resolve(data);
-              return;
+    const takePicture = () =>
+      new Promise((resolve, reject) => {
+        this.camera.takePicture(
+          {
+            preview: false,
+            download: true,
+          },
+          (er, data) => {
+            if (er < 0) {
+              console.warn('NCCamera', 'Error received from camera', er);
+              reject(er);
             } else {
-              console.warn('NCCamera', 'Empty data received from camera', er);
+              if (data) {
+                resolve(data);
+                return;
+              } else {
+                console.warn('NCCamera', 'Empty data received from camera', er);
+              }
             }
           }
-        }
+        );
+      });
+
+    if (autofocus) {
+      return promiseRetry(
+        retry => {
+          return this.autofocus()
+            .then(takePicture)
+            .catch(retry);
+        },
+        { retries: 5, minTimeout: 500, maxTimeout: 2000 }
       );
-    });
+    } else {
+      return takePicture();
+    }
   };
 
   autofocus = () => {
-    return this.setSetting('cancelautofocus', 1).then(
-      this.setSetting('autofocusdrive', 1)
-    );
+    return this.setSetting('cancelautofocus', 1).then(() => {
+      return this.setSetting('autofocusdrive', 1);
+    });
   };
 
   getSettings = () => {
