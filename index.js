@@ -173,25 +173,31 @@ class NCCamera {
 
     const takePicture = () =>
       new Promise((resolve, reject) => {
-        this.camera.takePicture(
-          {
-            preview: false,
-            download: true,
-          },
-          (er, data) => {
-            if (er < 0) {
-              console.warn('NCCamera', 'Error received from camera', er);
-              reject(er);
-            } else {
-              if (data) {
-                resolve(data);
-                return;
+        this.setSetting('capturetarget', 'Internal RAM').then(() => {
+          this.camera.takePicture(
+            {
+              preview: false,
+              download: true,
+            },
+            (er, data) => {
+              if (er < 0) {
+                console.warn('NCCamera', 'Error received from camera', er);
+                reject(er);
               } else {
-                console.warn('NCCamera', 'Empty data received from camera', er);
+                if (data) {
+                  resolve(data);
+                  return;
+                } else {
+                  console.warn(
+                    'NCCamera',
+                    'Empty data received from camera',
+                    er
+                  );
+                }
               }
             }
-          }
-        );
+          );
+        });
       });
 
     if (autofocus) {
@@ -211,6 +217,36 @@ class NCCamera {
   autofocus = () => {
     return this.setSetting('cancelautofocus', 1).then(() => {
       return this.setSetting('autofocusdrive', 1);
+    });
+  };
+
+  startVideo = () => {
+    return this.setSetting('viewfinder', 1).then(() => {
+      return this.setSetting('capturetarget', 'Memory card').then(() => {
+        return this.setSetting('movierecordtarget', 'Card');
+      });
+    });
+  };
+
+  stopVideo = path => {
+    return this.setSetting('movierecordtarget', 'None').then(() => {
+      return new Promise((resolve, reject) => {
+        this.camera.waitEvent(
+          {
+            download: true,
+            targetPath: path,
+            duration: 2000,
+          },
+          er => {
+            if (er < 0) {
+              console.warn('NCCamera', 'Error received from camera', er);
+              reject(er);
+            } else {
+              resolve();
+            }
+          }
+        );
+      });
     });
   };
 

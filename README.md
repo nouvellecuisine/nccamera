@@ -58,6 +58,25 @@ The camera will take a picture.
 This returns a promise which resolves with the image data. It fails if no focus
 could be obtained.
 
+### Capture Video
+
+```javascript
+nccamera.startVideo();
+
+nccamera.stopVideo('/tmp/foo.mov').then(() => {
+  // Process video file
+});
+```
+
+The camera will take a video. `path` is the path on the host where video file will
+be written.
+
+Please note the following limitations:
+
+- The video will not fit in the camera's RAM so a memory card should be inserted in
+  the camera.
+- The provided `path` should not exist, otherwise it will not be overwritten.
+
 ## Example of using image data
 
 ### Writing to a PixiJS texture

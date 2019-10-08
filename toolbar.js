@@ -41,6 +41,7 @@ const CAMERA_SETTINGS = [
   'capturesettings',
   'imgsettings',
   'settings',
+  'actions',
   // Settings we need
   'autopoweroff',
   'imageformat',
@@ -48,6 +49,8 @@ const CAMERA_SETTINGS = [
   'iso',
   'shutterspeed',
   'aperture',
+  'capturetarget',
+  'viewfinder',
 ];
 
 class Toolbar {
