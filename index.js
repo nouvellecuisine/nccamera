@@ -231,21 +231,24 @@ class NCCamera {
   stopVideo = path => {
     return this.setSetting('movierecordtarget', 'None').then(() => {
       return new Promise((resolve, reject) => {
-        this.camera.waitEvent(
-          {
-            download: true,
-            targetPath: path,
-            duration: 2000,
-          },
-          er => {
-            if (er < 0) {
-              console.warn('NCCamera', 'Error received from camera', er);
-              reject(er);
-            } else {
-              resolve();
+        const options = path
+          ? {
+              download: true,
+              targetPath: path,
+              duration: 2000,
             }
+          : {
+              download: false,
+              duration: 2000,
+            };
+        this.camera.waitEvent(options, er => {
+          if (er < 0) {
+            console.warn('NCCamera', 'Error received from camera', er);
+            reject(er);
+          } else {
+            resolve();
           }
-        );
+        });
       });
     });
   };
