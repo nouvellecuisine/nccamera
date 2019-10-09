@@ -214,8 +214,12 @@ class NCCamera {
     }
   };
 
+  cancelFocus = () => {
+    return this.setSetting('cancelautofocus', 1);
+  };
+
   autofocus = () => {
-    return this.setSetting('cancelautofocus', 1).then(() => {
+    return this.cancelFocus().then(() => {
       return this.setSetting('autofocusdrive', 1);
     });
   };
