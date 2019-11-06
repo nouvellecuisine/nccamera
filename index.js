@@ -1,5 +1,6 @@
 const gphoto2 = require('@nouvellecuisine/gphoto2');
 const promiseRetry = require('promise-retry');
+const fs = require('fs');
 
 const Toolbar = require('./toolbar');
 
@@ -238,18 +239,21 @@ class NCCamera {
         const options = path
           ? {
               download: true,
-              targetPath: path,
+              targetPath: '/tmp/gphoto.XXXXXX',
               duration: 2000,
             }
           : {
               download: false,
               duration: 2000,
             };
-        this.camera.waitEvent(options, er => {
+        this.camera.waitEvent(options, (er, tmpfile) => {
           if (er < 0) {
             console.warn('NCCamera', 'Error received from camera', er);
             reject(er);
           } else {
+            if (tmpfile && path) {
+              fs.renameSync(tmpfile, path);
+            }
             resolve();
           }
         });
