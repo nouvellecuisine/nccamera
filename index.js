@@ -130,6 +130,11 @@ class NCCamera {
       return;
     }
 
+    if (!this.running) {
+      console.log('Cancel runLive as no longer running');
+      return;
+    }
+
     this.frameStart = Date.now();
 
     this.camera.takePicture(
