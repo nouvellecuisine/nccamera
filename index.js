@@ -245,11 +245,11 @@ class NCCamera {
           ? {
               download: true,
               targetPath: '/tmp/gphoto.XXXXXX',
-              duration: 2000,
+              duration: 8000,
             }
           : {
               download: false,
-              duration: 2000,
+              duration: 8000,
             };
         setTimeout(
           this.camera.waitEvent(options, (er, tmpfile) => {
