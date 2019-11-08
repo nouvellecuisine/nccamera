@@ -15,11 +15,13 @@ class NCCamera {
   frameEnd = 0;
   autostart = true;
   callback = null;
+  debug = false;
   toolbar = null;
 
-  constructor({ autostart = true, callback }) {
+  constructor({ autostart = true, callback, debug = false }) {
     this.autostart = autostart;
     this.callback = callback;
+    this.debug = debug;
 
     this.toolbar = new Toolbar(this);
 
@@ -73,10 +75,12 @@ class NCCamera {
 
     console.log('NCCamera', 'Initialize GPhoto');
     this.GPhoto = new gphoto2.GPhoto2();
-    this.GPhoto.setLogLevel(1);
-    this.GPhoto.on('log', function(level, domain, message) {
-      console.log('NCCamera', domain, message);
-    });
+    if (this.debug) {
+      this.GPhoto.setLogLevel(1);
+      this.GPhoto.on('log', function(level, domain, message) {
+        console.log('NCCamera', domain, message);
+      });
+    }
 
     return new Promise((resolve, reject) => {
       this.GPhoto.list(list => {
