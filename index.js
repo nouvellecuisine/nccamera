@@ -299,7 +299,8 @@ class NCCamera {
         if (er < 0) {
           reject('Cannot set config', er);
         } else {
-          resolve();
+          // Chaining setSetting too fast can cause the camera to crash, so just wait a bit here
+          setTimeout(resolve, 50);
         }
       });
     });
