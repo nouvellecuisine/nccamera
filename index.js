@@ -126,6 +126,7 @@ class NCCamera {
 
     console.log('NCCamera', 'Stopping live');
     this.running = false;
+    return this.setSetting('viewfinder', 0);
   };
 
   runLive = () => {
@@ -243,34 +244,38 @@ class NCCamera {
   };
 
   stopVideo = path => {
-    return this.setSetting('movierecordtarget', 'None').then(() => {
-      return new Promise((resolve, reject) => {
-        const options = path
-          ? {
-              download: true,
-              targetPath: '/tmp/gphoto.XXXXXX',
-              duration: 8000,
-            }
-          : {
-              download: false,
-              duration: 8000,
-            };
-        setTimeout(
-          this.camera.waitEvent(options, (er, tmpfile) => {
-            if (er < 0) {
-              console.warn('NCCamera', 'Error received from camera', er);
-              reject(er);
-            } else {
-              if (tmpfile && path) {
-                fs.renameSync(tmpfile, path);
+    return this.setSetting('movierecordtarget', 'None')
+      .then(() => {
+        return new Promise((resolve, reject) => {
+          const options = path
+            ? {
+                download: true,
+                targetPath: '/tmp/gphoto.XXXXXX',
+                duration: 8000,
               }
-              resolve();
-            }
-          }),
-          200
-        );
+            : {
+                download: false,
+                duration: 8000,
+              };
+          setTimeout(
+            this.camera.waitEvent(options, (er, tmpfile) => {
+              if (er < 0) {
+                console.warn('NCCamera', 'Error received from camera', er);
+                reject(er);
+              } else {
+                if (tmpfile && path) {
+                  fs.renameSync(tmpfile, path);
+                }
+                resolve();
+              }
+            }),
+            200
+          );
+        });
+      })
+      .then(() => {
+        return this.setSetting('viewfinder', 0);
       });
-    });
   };
 
   getSettings = () => {
