@@ -1,6 +1,6 @@
 {
   "name": "@nouvellecuisine/nccamera",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "Electron integration for node-gphoto2",
   "main": "index.js",
   "scripts": {
