@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/nouvellecuisine/nccamera#readme",
   "dependencies": {
-    "@nouvellecuisine/gphoto2": "^0.6.1",
+    "@nouvellecuisine/gphoto2": "^0.6.2",
     "promise-retry": "^1.1.1"
   }
 }
