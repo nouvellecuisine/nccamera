@@ -252,20 +252,17 @@ class NCCamera {
                 download: false,
                 duration: 8000,
               };
-          setTimeout(
-            this.camera.waitEvent(options, (er, tmpfile) => {
-              if (er < 0) {
-                console.warn('NCCamera', 'Error received from camera', er);
-                reject(er);
-              } else {
-                if (tmpfile && path) {
-                  fs.renameSync(tmpfile, path);
-                }
-                resolve();
+          this.camera.waitEvent(options, (er, tmpfile) => {
+            if (er < 0) {
+              console.warn('NCCamera', 'Error received from camera', er);
+              reject(er);
+            } else {
+              if (tmpfile && path) {
+                fs.renameSync(tmpfile, path);
               }
-            }),
-            200
-          );
+              resolve();
+            }
+          });
         });
       })
       .then(() => {
