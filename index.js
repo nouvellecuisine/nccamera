@@ -33,15 +33,10 @@ class NCCamera {
   hotplug = () => {
     this.setup().then(
       () => {
-        return this.getSettings().then(
-          settings => {
-            console.log('Got settings', settings);
-            if (settings) {
-              if (this.autostart) {
-                return this.startLive();
-              }
-            } else {
-              setTimeout(this.hotplug, 1000);
+        return this.setSetting('viewfinder', 1).then(
+          () => {
+            if (this.autostart) {
+              return this.startLive();
             }
           },
           error => {
