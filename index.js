@@ -231,43 +231,40 @@ class NCCamera {
   };
 
   startVideo = () => {
-    return this.setSetting('viewfinder', 1).then(() => {
-      return this.setSetting('capturetarget', 'Memory card').then(() => {
-        return this.setSetting('movierecordtarget', 'Card');
-      });
-    });
+    return this.setSetting('viewfinder', 1)
+      .then(() => this.setSetting('capturetarget', 'Memory card'))
+      .then(() => this.setSetting('movierecordtarget', 'Card'));
   };
 
   stopVideo = path => {
     return this.setSetting('movierecordtarget', 'None')
-      .then(() => {
-        return new Promise((resolve, reject) => {
-          const options = path
-            ? {
-                download: true,
-                targetPath: '/tmp/gphoto.XXXXXX',
-                duration: 8000,
+      .then(
+        () =>
+          new Promise((resolve, reject) => {
+            const options = path
+              ? {
+                  download: true,
+                  targetPath: '/tmp/gphoto.XXXXXX',
+                  duration: 8000,
+                }
+              : {
+                  download: false,
+                  duration: 8000,
+                };
+            this.camera.waitEvent(options, (er, tmpfile) => {
+              if (er < 0) {
+                console.warn('NCCamera', 'Error received from camera', er);
+                reject(er);
+              } else {
+                if (tmpfile && path) {
+                  fs.renameSync(tmpfile, path);
+                }
+                resolve();
               }
-            : {
-                download: false,
-                duration: 8000,
-              };
-          this.camera.waitEvent(options, (er, tmpfile) => {
-            if (er < 0) {
-              console.warn('NCCamera', 'Error received from camera', er);
-              reject(er);
-            } else {
-              if (tmpfile && path) {
-                fs.renameSync(tmpfile, path);
-              }
-              resolve();
-            }
-          });
-        });
-      })
-      .then(() => {
-        return this.setSetting('viewfinder', 0);
-      });
+            });
+          })
+      )
+      .then(() => this.setSetting('viewfinder', 0));
   };
 
   getSettings = () => {
