@@ -1,6 +1,7 @@
 const gphoto2 = require('@nouvellecuisine/gphoto2');
 const promiseRetry = require('promise-retry');
 const fs = require('fs');
+const path = require('path');
 
 const Toolbar = require('./toolbar');
 
@@ -236,7 +237,8 @@ class NCCamera {
       .then(() => this.setSetting('movierecordtarget', 'Card'));
   };
 
-  stopVideo = path => {
+  stopVideo = filePath => {
+    const tmpTemplate = `${path.dirname(filePath)}/gphoto.XXXXXX`;
     return this.setSetting('movierecordtarget', 'None')
       .then(
         () =>
@@ -244,21 +246,23 @@ class NCCamera {
             const options = path
               ? {
                   download: true,
-                  targetPath: '/tmp/gphoto.XXXXXX',
+                  targetPath: tmpTemplate,
                   duration: 8000,
                 }
               : {
                   download: false,
                   duration: 8000,
                 };
-            this.camera.waitEvent(options, (er, tmpfile) => {
+            this.camera.waitEvent(options, (er, tmpPath) => {
               if (er < 0) {
                 console.warn('NCCamera', 'Error received from camera', er);
                 reject(er);
               } else {
-                if (tmpfile && path) {
-                  fs.renameSync(tmpfile, path);
+                if (tmpTemplate === tmpPath) {
+                  reject('No output file downloaded.');
+                  return;
                 }
+                fs.renameSync(tmpPath, filePath);
                 resolve();
               }
             });
