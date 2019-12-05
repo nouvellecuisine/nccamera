@@ -247,11 +247,11 @@ class NCCamera {
               ? {
                   download: true,
                   targetPath: tmpTemplate,
-                  duration: 8000,
+                  duration: 60000,
                 }
               : {
                   download: false,
-                  duration: 8000,
+                  duration: 60000,
                 };
             this.camera.waitEvent(options, (er, tmpPath) => {
               if (er < 0) {
