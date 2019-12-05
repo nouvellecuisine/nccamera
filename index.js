@@ -238,12 +238,12 @@ class NCCamera {
   };
 
   stopVideo = filePath => {
-    const tmpTemplate = `${path.dirname(filePath)}/gphoto.XXXXXX`;
+    const tmpTemplate = filePath && `${path.dirname(filePath)}/gphoto.XXXXXX`;
     return this.setSetting('movierecordtarget', 'None')
       .then(
         () =>
           new Promise((resolve, reject) => {
-            const options = path
+            const options = filePath
               ? {
                   download: true,
                   targetPath: tmpTemplate,

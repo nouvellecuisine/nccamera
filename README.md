@@ -76,6 +76,7 @@ Please note the following limitations:
 - The video will not fit in the camera's RAM so a memory card should be inserted in
   the camera.
 - The provided `path` should not exist, otherwise it will not be overwritten.
+- A temporary file will be created in the same directory as the given `path`.
 
 ## Example of using image data
 
