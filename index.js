@@ -42,13 +42,13 @@ class NCCamera {
           },
           error => {
             console.warn('Could not talk to camera', error);
-            setTimeout(this.hotplug, 1000);
+            this.timerHotplug = setTimeout(this.hotplug, 1000);
           }
         );
       },
       error => {
         console.error('NCCameraClient', 'Failed opening camera:', error);
-        setTimeout(this.hotplug, 1000);
+        this.timerHotplug = setTimeout(this.hotplug, 1000);
       }
     );
   };
