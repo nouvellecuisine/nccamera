@@ -61,13 +61,13 @@ class Toolbar {
     this.nccamera = nccamera;
 
     document.addEventListener('keyup', event => {
-      if (event.keyCode === 67) {
-        if (this.container) {
-          this.hide();
-        } else {
-          this.show();
-        }
-      }
+      // if (event.keyCode === 67) {
+      //   if (this.container) {
+      //     this.hide();
+      //   } else {
+      //     this.show();
+      //   }
+      // }
     });
   }
 
